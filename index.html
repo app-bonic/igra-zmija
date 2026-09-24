@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zmija po Jadranu</title>
+<meta name="description" content="Klasična zmija na Jadranu: lovi ribe između otoka, pazi da ne udariš u obalu ili svoj rep. Strelice, povlačenje prstom ili gumbi.">
+<meta name="theme-color" content="#120a33">
+<link rel="icon" href="zajednicko/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="zajednicko/apple-touch-icon.png">
+<link rel="stylesheet" href="zajednicko/igre.css?v=09b9727d">
+<style>
+  .pozornica { position: relative; width: min(100%, 480px); margin: 0 auto; }
+  #platno { display: block; width: 100%; aspect-ratio: 1; border-radius: 22px; border: 2px solid #5dff9b55; box-shadow: 0 0 40px #5dff9b22; touch-action: none; user-select: none; background: #0d2f6e; }
+  .preko { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; border-radius: 22px; background: #0b0520aa; }
+  .preko[hidden] { display: none; }
+  .preko p { color: var(--blijedo); max-width: 28ch; margin: 12px auto 0; }
+  .preko h2 { font: 900 italic 34px/1 var(--naslovni); color: var(--zelena); margin-bottom: 14px; text-shadow: 0 0 20px #5dff9b88; }
+  .krizic { display: grid; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(2, 56px); gap: 8px; justify-content: center; margin-top: 14px; }
+  .krizic button { border-radius: 16px; border: 2px solid var(--crta); background: #ffffff14; color: #fff; cursor: pointer; display: grid; place-items: center; box-shadow: 0 4px 0 #0007; touch-action: manipulation; }
+  .krizic button:active { transform: translateY(3px); box-shadow: 0 1px 0 #0007; background: #5dff9b33; }
+  .krizic .ik { width: 26px; height: 26px; }
+  .krizic [data-s="gore"] { grid-column: 2; } .krizic [data-s="gore"] .ik { transform: rotate(-90deg); }
+  .krizic [data-s="lijevo"] { grid-column: 1; grid-row: 2; } .krizic [data-s="lijevo"] .ik { transform: rotate(180deg); }
+  .krizic [data-s="dolje"] { grid-column: 2; grid-row: 2; } .krizic [data-s="dolje"] .ik { transform: rotate(90deg); }
+  .krizic [data-s="desno"] { grid-column: 3; grid-row: 2; }
+  @media (hover: hover) and (pointer: fine) { .krizic { display: none; } }
+</style>
+</head>
+<body data-igra="igra-zmija">
+<header class="ig-vrh"></header>
+<main class="ig-omot">
+  <section class="ig-naslov"><span class="znak"></span><div><h1>Zmija po Jadranu</h1><p>Zmija pliva između otoka i lovi ribe. Svaka riba = dulji rep i brže plivanje. Rub mora vodi na drugu stranu, ali otoci i vlastiti rep — ne!</p></div></section>
+
+  <div class="stupci">
+    <div>
+      <div class="pozornica">
+        <canvas id="platno" width="400" height="400" aria-label="More s otocima i zmijom"></canvas>
+        <div class="preko" id="preko"><div id="prekoSadrzaj">
+          <h2>Zaplivaj!</h2>
+          <button type="button" class="gumb zeleni veliki" id="kreni">Kreni</button>
+          <p>Strelice / WASD, povlačenje prstom ili gumbi ispod. Razmaknica = pauza.</p>
+        </div></div>
+      </div>
+      <div class="krizic" id="krizic"></div>
+    </div>
+    <aside style="display:flex;flex-direction:column;gap:16px">
+      <div class="statusi">
+        <div class="status"><small>Ribe</small><b id="bodovi">0</b></div>
+        <div class="status"><small>Duljina</small><b id="duljina">3</b></div>
+        <div class="status"><small>Rekord</small><b id="rek">0</b></div>
+      </div>
+      <div class="ploca"><h2>Zlatna ribica</h2><p class="pomoc" style="margin:0">Ponekad se pojavi zlatna ribica — vrijedi <b style="color:var(--zuta)">5 riba</b>, ali brzo nestaje!</p></div>
+    </aside>
+  </div>
+</main>
+<footer class="ig-dno"></footer>
+<script src="zajednicko/igre.js?v=4689b224"></script>
+<script>
+'use strict';
+const { $, zvuk, konfeti, rekord, ikona } = IG;
+const N = 20, P = 20;
+const KARTA = [
+  '....................',
+  '....................',
+  '..##..........##....',
+  '..###.........##....',
+  '...##...............',
+  '....................',
+  '..........###.......',
+  '...........###......',
+  '....................',
+  '....................',
+  '....................',
+  '.##.................',
+  '.###.........##.....',
+  '..#..........###....',
+  '...............#....',
+  '....................',
+  '.......###..........',
+  '........###.........',
+  '....................',
+  '....................',
+];
+const OTOK = new Set(); KARTA.forEach((r, y) => [...r].forEach((z, x) => { if (z === '#') OTOK.add(y * N + x); }));
+const SMJER = { gore: [0, -1], dolje: [0, 1], lijevo: [-1, 0], desno: [1, 0] };
+const platno = $('#platno'), c = platno.getContext('2d');
+(function () { const d = Math.min(2, devicePixelRatio || 1); platno.width = N * P * d; platno.height = N * P * d; c.setTransform(d, 0, 0, d, 0, 0); })();
+
+let stanje = 'cekanje', zmija, smjer, red, riba, zlatna, bodovi, takt, tajmer, pauza = false, rast, animT = 0;
+function reset() {
+  zmija = [[6, 9], [5, 9], [4, 9]]; smjer = 'desno'; red = []; bodovi = 0; takt = 150; rast = 0; zlatna = null;
+  riba = slobodno(); osvjezi();
+}
+function slobodno() {
+  for (;;) {
+    const x = Math.floor(Math.random() * N), y = Math.floor(Math.random() * N);
+    if (!OTOK.has(y * N + x) && !zmija.some(([a, b]) => a === x && b === y) && !(riba && riba[0] === x && riba[1] === y)) return [x, y];
+  }
+}
+function kreni() { reset(); stanje = 'igra'; pauza = false; $('#preko').hidden = true; zvuk.klik(); zakazi(); }
+function zakazi() { clearTimeout(tajmer); tajmer = setTimeout(korak, takt); }
+function okreni(s) {
+  if (stanje !== 'igra') return;
+  const zadnji = red.length ? red[red.length - 1] : smjer, [dx, dy] = SMJER[s], [zx, zy] = SMJER[zadnji];
+  if (s === zadnji || (dx === -zx && dy === -zy) || red.length >= 3) return;
+  red.push(s);
+}
+function korak() {
+  if (stanje !== 'igra' || pauza) return;
+  if (red.length) smjer = red.shift();
+  const [dx, dy] = SMJER[smjer], [hx, hy] = zmija[0];
+  const nx = (hx + dx + N) % N, ny = (hy + dy + N) % N;   // rub mora = prolaz na drugu stranu
+  const tijelo = rast > 0 ? zmija : zmija.slice(0, -1);
+  if (OTOK.has(ny * N + nx) || tijelo.some(([a, b]) => a === nx && b === ny)) return kraj();
+  zmija.unshift([nx, ny]);
+  if (rast > 0) rast--; else zmija.pop();
+  if (nx === riba[0] && ny === riba[1]) {
+    bodovi++; rast += 1; takt = Math.max(70, takt - 3); zvuk.bod(); riba = slobodno();
+    if (!zlatna && bodovi % 6 === 0) { zlatna = { p: slobodno(), do: performance.now() + 6000 }; }
+  }
+  if (zlatna && nx === zlatna.p[0] && ny === zlatna.p[1]) { bodovi += 5; rast += 3; zlatna = null; zvuk.tocno(); IG.obavijest('Zlatna ribica! +5'); }
+  if (zlatna && performance.now() > zlatna.do) zlatna = null;
+  osvjezi(); crtaj(); zakazi();
+}
+function kraj() {
+  stanje = 'kraj'; clearTimeout(tajmer); zvuk.poraz(); IG.efekt(platno, 'tresi');
+  const novi = rekord.predlozi(bodovi);
+  crtaj(true);
+  setTimeout(() => {
+    $('#prekoSadrzaj').innerHTML = `<h2>${novi && bodovi ? 'Novi rekord!' : 'Au, nasukali smo se!'}</h2>
+      <p style="margin:0 auto 16px;font-size:18px;color:#fff">${bodovi} ${IG.mn(bodovi, 'riba', 'ribe', 'riba')} · duljina ${zmija.length}</p>
+      <button type="button" class="gumb zeleni veliki" id="kreni">${ikona('osvjezi')} Opet</button>`;
+    $('#kreni').onclick = kreni; $('#preko').hidden = false; osvjezi();
+    if (novi && bodovi >= 10) konfeti();
+  }, 500);
+}
+function osvjezi() { $('#bodovi').textContent = bodovi; $('#duljina').textContent = zmija.length + rast; $('#rek').textContent = rekord.uzmi(); }
+
+function riba1(x, y, boja, sjaj) {
+  const cx = x * P + P / 2, cy = y * P + P / 2;
+  c.fillStyle = boja; if (sjaj) { c.shadowColor = boja; c.shadowBlur = 14; }
+  c.beginPath(); c.ellipse(cx - 1, cy, 7, 4.5, 0, 0, 7); c.fill();
+  c.beginPath(); c.moveTo(cx + 4, cy); c.lineTo(cx + 9, cy - 5); c.lineTo(cx + 9, cy + 5); c.fill(); c.shadowBlur = 0;
+  c.fillStyle = '#120a33'; c.beginPath(); c.arc(cx - 4, cy - 1, 1.3, 0, 7); c.fill();
+}
+function crtaj(mrtva) {
+  // more
+  c.fillStyle = '#0d2f6e'; c.fillRect(0, 0, N * P, N * P);
+  c.fillStyle = '#ffffff0d';
+  for (let y = 0; y < N; y++) for (let x = (y % 2); x < N; x += 2) c.fillRect(x * P, y * P, P, P);
+  // otoci: pijesak + zelenilo
+  for (const k of OTOK) { const x = k % N, y = Math.floor(k / N); c.fillStyle = '#f5d28a'; c.fillRect(x * P - 1, y * P - 1, P + 2, P + 2); }
+  for (const k of OTOK) { const x = k % N, y = Math.floor(k / N); c.fillStyle = '#3fbf6a'; c.beginPath(); c.arc(x * P + P / 2, y * P + P / 2, P * .42, 0, 7); c.fill(); }
+  // ribe
+  riba1(riba[0], riba[1], '#ff9f43', false);
+  if (zlatna) riba1(zlatna.p[0], zlatna.p[1], '#ffe14d', true);
+  // zmija: od repa prema glavi, prelijevanje boja
+  zmija.slice().reverse().forEach(([x, y], i, arr) => {
+    const k = i / Math.max(1, arr.length - 1);
+    c.fillStyle = mrtva ? '#ff4d6d' : `hsl(${150 - k * 40} 100% ${55 + k * 10}%)`;
+    const m = i === arr.length - 1 ? 1 : 2.5;
+    c.beginPath(); c.roundRect(x * P + m, y * P + m, P - 2 * m, P - 2 * m, 6); c.fill();
+  });
+  // oči na glavi
+  const [hx, hy] = zmija[0], [dx, dy] = SMJER[smjer], cx = hx * P + P / 2, cy = hy * P + P / 2;
+  c.fillStyle = '#fff';
+  [[-1, 1], [1, 1]].forEach(([s]) => { c.beginPath(); c.arc(cx + dx * 4 + dy * 4 * s, cy + dy * 4 - dx * 4 * s, 3, 0, 7); c.fill(); });
+  c.fillStyle = '#120a33';
+  [[-1], [1]].forEach(([s]) => { c.beginPath(); c.arc(cx + dx * 5 + dy * 4 * s, cy + dy * 5 - dx * 4 * s, 1.5, 0, 7); c.fill(); });
+  if (pauza) { c.fillStyle = '#0b0520aa'; c.fillRect(0, 0, N * P, N * P); c.fillStyle = '#fff'; c.font = 'italic 900 40px "Exo 2", sans-serif'; c.textAlign = 'center'; c.fillText('PAUZA', N * P / 2, N * P / 2 + 14); }
+}
+
+const TIPKE = { ArrowUp: 'gore', ArrowDown: 'dolje', ArrowLeft: 'lijevo', ArrowRight: 'desno', w: 'gore', s: 'dolje', a: 'lijevo', d: 'desno' };
+document.addEventListener('keydown', e => {
+  const s = TIPKE[e.key] || TIPKE[e.key.toLowerCase()];
+  if (s && stanje === 'igra') { e.preventDefault(); okreni(s); return; }
+  if (e.key === ' ') {
+    e.preventDefault();
+    if (stanje === 'igra') { pauza = !pauza; crtaj(); if (!pauza) zakazi(); }
+    else if (!$('#preko').hidden) $('#kreni').click();
+  }
+});
+let dodir = null;
+platno.addEventListener('pointerdown', e => { dodir = [e.clientX, e.clientY]; });
+platno.addEventListener('pointermove', e => {
+  if (!dodir) return;
+  const dx = e.clientX - dodir[0], dy = e.clientY - dodir[1];
+  if (Math.max(Math.abs(dx), Math.abs(dy)) < 22) return;
+  okreni(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'desno' : 'lijevo') : (dy > 0 ? 'dolje' : 'gore'));
+  dodir = [e.clientX, e.clientY];
+});
+['pointerup', 'pointercancel'].forEach(t => platno.addEventListener(t, () => { dodir = null; }));
+$('#krizic').innerHTML = ['gore', 'lijevo', 'dolje', 'desno'].map(s => `<button type="button" data-s="${s}" aria-label="${s}">${ikona('strelica')}</button>`).join('');
+$('#krizic').addEventListener('pointerdown', e => { const b = e.target.closest('[data-s]'); if (b) { e.preventDefault(); okreni(b.dataset.s); } });
+$('#kreni').onclick = kreni;
+reset(); crtaj();
+</script>
+</body>
+</html>

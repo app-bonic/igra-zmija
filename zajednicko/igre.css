@@ -1,0 +1,148 @@
+/* app-bonic igre — zajednički stil (izvor: GITHUB Projects/IGRE/_zajednicko)
+   Smjer: futuristično-gamerski, razigrano za djecu: svemirska ljubičasta, neonske boje, zaobljena slova, „3D” gumbi. */
+
+@font-face { font-family: 'Fredoka'; font-style: normal; font-display: swap; font-weight: 300 700; src: url(fonts/fredoka-latin-ext-wght-normal.woff2) format('woff2-variations'); unicode-range: U+0100-02AF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Fredoka'; font-style: normal; font-display: swap; font-weight: 300 700; src: url(fonts/fredoka-latin-wght-normal.woff2) format('woff2-variations'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Exo 2'; font-style: normal; font-display: swap; font-weight: 800; src: url(fonts/exo-2-latin-ext-800-normal.woff2) format('woff2'); unicode-range: U+0100-02AF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Exo 2'; font-style: normal; font-display: swap; font-weight: 800; src: url(fonts/exo-2-latin-800-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Exo 2'; font-style: italic; font-display: swap; font-weight: 900; src: url(fonts/exo-2-latin-ext-900-italic.woff2) format('woff2'); unicode-range: U+0100-02AF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Exo 2'; font-style: italic; font-display: swap; font-weight: 900; src: url(fonts/exo-2-latin-900-italic.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+
+:root {
+  --bg1: #120a33;
+  --bg2: #22105e;
+  --plo: rgb(255 255 255 / .07);
+  --plo-jako: rgb(255 255 255 / .12);
+  --crta: rgb(255 255 255 / .16);
+  --tekst: #f5f2ff;
+  --blijedo: #bdb3ee;
+  --cijan: #22e3ff;
+  --roza: #ff4bd8;
+  --zuta: #ffe14d;
+  --zelena: #5dff9b;
+  --crvena: #ff4d6d;
+  --narancasta: #ff9f43;
+  --ljubicasta: #9b7bff;
+  --naslovni: 'Exo 2', 'Segoe UI', sans-serif;
+  --r: 22px;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+  color: var(--tekst); font: 17px/1.5 'Fredoka', 'Segoe UI', system-ui, sans-serif;
+  background:
+    radial-gradient(1.5px 1.5px at 20% 30%, #fff9 50%, transparent 51%) 0 0 / 180px 180px,
+    radial-gradient(1px 1px at 70% 80%, #fff7 50%, transparent 51%) 0 0 / 130px 130px,
+    radial-gradient(2px 2px at 45% 60%, #22e3ff88 50%, transparent 51%) 0 0 / 260px 260px,
+    radial-gradient(900px 600px at 85% -10%, #ff4bd83a, transparent 60%),
+    radial-gradient(800px 600px at -10% 20%, #22e3ff2a, transparent 60%),
+    linear-gradient(170deg, var(--bg1), var(--bg2) 60%, #140a3a);
+  background-attachment: fixed;
+  -webkit-tap-highlight-color: transparent;
+}
+main { flex: 1; }
+button, input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3, p { margin: 0; }
+a { color: var(--cijan); }
+:focus-visible { outline: 3px solid var(--zuta); outline-offset: 3px; border-radius: 8px; }
+.ik { width: 20px; height: 20px; flex: none; }
+[hidden] { display: none !important; }
+
+/* ---------- zaglavlje ---------- */
+.ig-vrh { position: sticky; top: 0; z-index: 20; background: rgb(18 10 51 / .78); backdrop-filter: blur(10px); border-bottom: 1px solid var(--crta); }
+.ig-vrh::before { content: ""; display: block; height: 4px; background: linear-gradient(90deg, var(--cijan), var(--roza), var(--zuta), var(--zelena)); }
+.ig-vrh-unutra { max-width: 1180px; margin: 0 auto; padding: 9px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.ig-marka { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--tekst); }
+.ig-marka img { width: 40px; height: 40px; border-radius: 10px; box-shadow: 0 0 0 2px #ffffff22, 0 0 18px #ff4bd866; transition: transform .25s; }
+.ig-marka:hover img { transform: rotate(-8deg) scale(1.06); }
+.ig-marka b { font: 900 italic 21px/1 var(--naslovni); text-transform: uppercase; letter-spacing: .02em; display: block; }
+.ig-marka small { font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--zuta); display: block; margin-top: 3px; }
+.ig-vrh nav { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.ig-vrh nav a { text-decoration: none; font-weight: 600; font-size: 14.5px; padding: 8px 14px; border-radius: 999px; background: var(--plo); border: 1.5px solid var(--crta); color: var(--tekst); display: inline-flex; align-items: center; gap: 7px; transition: border-color .15s, transform .15s; }
+.ig-vrh nav a:hover { border-color: var(--cijan); transform: translateY(-1px); }
+.ig-vrh nav .zvuk { cursor: pointer; }
+
+/* ---------- raspored ---------- */
+.ig-omot { max-width: 1180px; margin: 0 auto; padding: 0 18px; width: 100%; }
+.ig-naslov { padding: 26px 0 18px; display: flex; align-items: center; gap: 16px; }
+.ig-naslov .znak { width: 60px; height: 60px; border-radius: 18px; display: grid; place-items: center; flex: none; color: #140a3a; background: var(--boja, var(--cijan)); box-shadow: 0 6px 0 #0006, 0 0 24px color-mix(in srgb, var(--boja, var(--cijan)) 60%, transparent); transform: rotate(-6deg); }
+.ig-naslov .znak .ik { width: 32px; height: 32px; stroke-width: 2.4; }
+.ig-naslov h1 { font: 900 italic clamp(30px, 5.5vw, 50px)/1 var(--naslovni); text-transform: uppercase; letter-spacing: .01em; color: #fff; text-shadow: 0 0 22px color-mix(in srgb, var(--boja, var(--cijan)) 70%, transparent), 0 3px 0 #0005; }
+.ig-naslov p { color: var(--blijedo); margin-top: 6px; font-size: 16.5px; max-width: 62ch; }
+
+.ploca { background: var(--plo); border: 1.5px solid var(--crta); border-radius: var(--r); padding: 18px; box-shadow: 0 20px 50px -25px #000c, inset 0 1px 0 #ffffff14; backdrop-filter: blur(4px); }
+.ploca h2 { font: 800 20px/1.1 var(--naslovni); text-transform: uppercase; letter-spacing: .03em; margin-bottom: 12px; color: var(--zuta); }
+.stupci { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 900px) { .stupci { grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); } }
+
+/* ---------- statistika (bodovi, rekord…) ---------- */
+.statusi { display: flex; flex-wrap: wrap; gap: 10px; }
+.status { flex: 1 1 110px; background: #0006; border: 1.5px solid var(--crta); border-radius: 16px; padding: 8px 14px; text-align: center; }
+.status small { display: block; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--blijedo); }
+.status b { font: 900 italic 28px/1.1 var(--naslovni); color: var(--boja, var(--cijan)); text-shadow: 0 0 14px color-mix(in srgb, var(--boja, var(--cijan)) 60%, transparent); font-variant-numeric: tabular-nums; }
+
+/* ---------- gumbi ---------- */
+.gumb {
+  --g: var(--plo-jako); --gt: var(--tekst); --gs: #0008;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px;
+  padding: 10px 20px; border-radius: 16px; border: 0; cursor: pointer; text-decoration: none; user-select: none;
+  background: var(--g); color: var(--gt); font-weight: 700; font-size: 16.5px; letter-spacing: .01em;
+  box-shadow: 0 5px 0 var(--gs), inset 0 1px 0 #ffffff33; transition: transform .08s, box-shadow .08s, filter .15s;
+}
+.gumb:hover:not(:disabled) { filter: brightness(1.12); }
+.gumb:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--gs), inset 0 1px 0 #ffffff33; }
+.gumb:disabled { opacity: .45; cursor: not-allowed; }
+.gumb.zuti { --g: var(--zuta); --gt: #2a1a00; --gs: #b58f00; }
+.gumb.cijan { --g: var(--cijan); --gt: #03242c; --gs: #0a8aa0; }
+.gumb.rozi { --g: var(--roza); --gt: #fff; --gs: #a0208a; }
+.gumb.zeleni { --g: var(--zelena); --gt: #033117; --gs: #1f9c55; }
+.gumb.veliki { min-height: 58px; font-size: 20px; padding: 12px 28px; border-radius: 20px; }
+.gumbi { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+input[type="text"], input[type="number"], input:not([type]), select {
+  width: 100%; padding: 12px 16px; border-radius: 14px; border: 2px solid var(--crta); background: #0007; color: var(--tekst); outline: none; font-size: 17px;
+}
+input:focus, select:focus { border-color: var(--cijan); box-shadow: 0 0 0 4px #22e3ff33; }
+select option { background: #1f0f57; }
+
+/* ---------- poruke i efekti ---------- */
+.obavijest {
+  position: fixed; left: 50%; top: 84px; z-index: 60; transform: translate(-50%, -12px) scale(.95); opacity: 0; pointer-events: none;
+  background: #fff; color: #1a0d45; padding: 11px 20px; border-radius: 999px; font-weight: 700; font-size: 16px;
+  box-shadow: 0 10px 30px #0008, 0 0 0 3px var(--zuta); transition: opacity .18s, transform .18s; max-width: calc(100vw - 32px); text-align: center;
+}
+.obavijest.vidljiv { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.tresi { animation: tresi .35s; }
+@keyframes tresi { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+.poskok { animation: poskok .35s; }
+@keyframes poskok { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
+canvas.konfeti { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 70; }
+
+.kraj-igre { text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; padding: 10px 0; }
+.kraj-igre h2 { font: 900 italic 34px/1 var(--naslovni); text-transform: uppercase; color: var(--zuta); text-shadow: 0 0 20px #ffe14d88; margin: 0; }
+.kraj-igre p { color: var(--blijedo); }
+
+.pomoc { color: var(--blijedo); font-size: 15px; }
+.pomoc b { color: var(--tekst); }
+.oznaka { display: inline-block; font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; background: var(--boja, var(--cijan)); color: #140a3a; }
+
+/* ---------- podnožje ---------- */
+.ig-dno { margin-top: 50px; border-top: 1px solid var(--crta); background: #0b0620cc; }
+.ig-dno-unutra { max-width: 1180px; margin: 0 auto; padding: 28px 18px 30px; display: grid; gap: 22px; }
+@media (min-width: 900px) { .ig-dno-unutra { grid-template-columns: minmax(0, .9fr) minmax(0, 1.3fr); } .ig-potpis { grid-column: 1 / -1; } }
+.ig-sigurno b { font: 900 italic 22px/1.1 var(--naslovni); text-transform: uppercase; color: var(--zelena); display: block; margin-bottom: 6px; }
+.ig-sigurno p { color: var(--blijedo); font-size: 15px; }
+.ig-ostale h3 { font: 800 16px/1 var(--naslovni); text-transform: uppercase; letter-spacing: .06em; color: var(--zuta); margin-bottom: 10px; }
+.ig-ostale ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.ig-ostale a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--tekst); font-size: 14.5px; font-weight: 500; padding: 5px 12px; border-radius: 999px; background: var(--plo); border: 1px solid var(--crta); }
+.ig-ostale a .ik { width: 15px; height: 15px; color: var(--c, var(--cijan)); }
+.ig-ostale a:hover { border-color: var(--c, var(--cijan)); }
+.ig-ostale a[aria-current="page"] { background: var(--plo-jako); border-color: var(--zuta); }
+.ig-potpis { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; color: var(--blijedo); font-size: 14px; border-top: 1px solid var(--crta); padding-top: 16px; }
+.ig-potpis img { width: 28px; height: 28px; border-radius: 7px; }
+.ig-potpis a { color: var(--blijedo); }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
