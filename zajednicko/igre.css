@@ -145,4 +145,73 @@ canvas.konfeti { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer
 .ig-potpis img { width: 28px; height: 28px; border-radius: 7px; }
 .ig-potpis a { color: var(--blijedo); }
 
+/* ---------- gumb „Kako se igra?” (samo mobitel) ---------- */
+.upute-gumb { display: none; margin-left: auto; flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--crta); background: var(--plo); color: var(--tekst); font: 800 18px/1 var(--naslovni); cursor: pointer; place-items: center; }
+.ig-naslov.otvoren .upute-gumb { background: var(--boja, var(--cijan)); color: #140a3a; border-color: transparent; }
+
+/* ---------- mobitel: cijela igra mora stati na ekran bez skrolanja ----------
+   --igra-v (računa igre.js) = visina koja ostaje od vrha .stupci do dna ekrana */
+@media (max-width: 700px) {
+  body { font-size: 16px; }
+  .ig-vrh { position: relative; }
+  .ig-vrh-unutra { padding: 6px 12px; gap: 8px; flex-wrap: nowrap; }
+  .ig-marka { gap: 8px; }
+  .ig-marka img { width: 32px; height: 32px; border-radius: 8px; }
+  .ig-marka b { font-size: 16px; }
+  .ig-marka small { font-size: 9.5px; letter-spacing: .12em; margin-top: 2px; }
+  .ig-vrh nav { gap: 6px; flex-wrap: nowrap; }
+  .ig-vrh nav a { padding: 7px 10px; font-size: 13px; }
+  .ig-omot { padding: 0 12px; }
+  .ig-naslov { padding: 10px 0; gap: 10px; }
+  .ig-naslov .znak { width: 38px; height: 38px; border-radius: 12px; box-shadow: 0 4px 0 #0006; }
+  .ig-naslov .znak .ik { width: 22px; height: 22px; }
+  .ig-naslov h1 { font-size: clamp(20px, 6.4vw, 26px); }
+  .ig-naslov p { display: none; font-size: 14.5px; line-height: 1.4; }
+  .ig-naslov.otvoren p { display: block; }
+  .upute-gumb { display: grid; }
+  .stupci { gap: 10px; }
+  .ploca { padding: 12px; border-radius: 18px; }
+  .ploca h2 { font-size: 16px; margin-bottom: 8px; }
+  .statusi { gap: 6px; flex-wrap: nowrap; }
+  .status { flex: 1 1 0; min-width: 0; padding: 3px 6px; border-radius: 12px; }
+  .status small { font-size: 10px; letter-spacing: .05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .status b { font-size: 20px; }
+  .gumb { min-height: 42px; padding: 8px 14px; font-size: 15.5px; border-radius: 14px; }
+  /* mali gumb „nova igra” na kraju retka statusa */
+  .statusi .status-gumb { flex: none; width: 46px; min-height: 0; padding: 0; border-radius: 12px; box-shadow: 0 4px 0 var(--gs); }
+  .statusi .status-gumb .ik { width: 22px; height: 22px; }
+  .gumb.veliki { min-height: 48px; font-size: 18px; padding: 8px 20px; border-radius: 16px; }
+  .kraj-igre { gap: 8px; padding: 4px 0; }
+  .kraj-igre h2 { font-size: 26px; }
+  .obavijest { top: 10px; }
+  .ig-dno { margin-top: 28px; }
+  .samo-sirok { display: none !important; }
+
+  /* redovi „pilula” (težina, tema, način) u jednom retku — vodoravno klizanje umjesto više redaka */
+  body :is(.izbor, .teme, .nacin, .vrste) { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; gap: 6px; margin-bottom: 8px; padding: 2px 0; scrollbar-width: none; }
+  body :is(.izbor, .teme, .nacin, .vrste)::-webkit-scrollbar { display: none; }
+  body :is(.izbor, .teme, .nacin, .vrste) > :first-child { margin-left: auto; }
+  body :is(.izbor, .teme, .nacin, .vrste) > :last-child { margin-right: auto; }
+  body :is(.izbor, .teme, .nacin, .vrste) button { flex: none; padding: 5px 12px; font-size: 14px; white-space: nowrap; }
+  /* .izbori = više redaka izbora spojeno u jedan redak */
+  .izbori { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-bottom: 8px; padding: 2px 0; }
+  .izbori::-webkit-scrollbar { display: none; }
+  body .izbori .izbor { overflow: visible; margin: 0; padding: 0; flex: none; }
+  body .izbori .izbor > * { margin: 0; }
+  .izbori > :first-child { margin-left: auto !important; } .izbori > :last-child { margin-right: auto !important; }
+
+  /* .stupci.mob: bočni stupac se „rastopi” u retke — statusi gore, igra, gumbi dolje, kraj igre preko ploče */
+  .stupci.mob > aside { display: contents !important; }
+  .stupci.mob > *, .stupci.mob > aside > * { min-width: 0; grid-column: 1; }
+  .mob-gore { grid-row: 1; }
+  .mob-igra { grid-row: 2; }
+  .mob-dolje { grid-row: 3; }
+  .mob-dno { grid-row: 4; }
+  /* gumb premješten preko karte/ploče (IG.mobMjesto) */
+  .preko-dno { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; margin: 0 !important; z-index: 3; }
+  .mob-preko { grid-row: 2; align-self: center; justify-self: center; z-index: 5; width: min(100% - 16px, 340px); background: #1a0d48f2 !important; box-shadow: 0 20px 60px #000c, 0 0 0 2px var(--boja, var(--cijan)) !important; border-radius: 20px; padding: 16px !important; }
+}
+@media (max-width: 520px) { .ig-vrh nav a .tekst { display: none; } }
+@media (min-width: 701px) { .samo-mob { display: none !important; } }
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

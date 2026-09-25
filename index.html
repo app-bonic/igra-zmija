@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#120a33">
 <link rel="icon" href="zajednicko/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="zajednicko/apple-touch-icon.png">
-<link rel="stylesheet" href="zajednicko/igre.css?v=09b9727d">
+<link rel="stylesheet" href="zajednicko/igre.css?v=cc838426">
 <style>
   .pozornica { position: relative; width: min(100%, 480px); margin: 0 auto; }
   #platno { display: block; width: 100%; aspect-ratio: 1; border-radius: 22px; border: 2px solid #5dff9b55; box-shadow: 0 0 40px #5dff9b22; touch-action: none; user-select: none; background: #0d2f6e; }
@@ -25,6 +25,11 @@
   .krizic [data-s="dolje"] { grid-column: 2; grid-row: 2; } .krizic [data-s="dolje"] .ik { transform: rotate(90deg); }
   .krizic [data-s="desno"] { grid-column: 3; grid-row: 2; }
   @media (hover: hover) and (pointer: fine) { .krizic { display: none; } }
+  @media (max-width: 700px) {
+    .pozornica { width: min(100%, calc(var(--igra-v, 100vh) - 186px)); }
+    .krizic { grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(2, 52px); gap: 6px; margin-top: 10px; }
+  }
+  @media (max-width: 700px) and (hover: hover) and (pointer: fine) { .pozornica { width: min(100%, calc(var(--igra-v, 100vh) - 56px)); } }
 </style>
 </head>
 <body data-igra="igra-zmija">
@@ -32,8 +37,8 @@
 <main class="ig-omot">
   <section class="ig-naslov"><span class="znak"></span><div><h1>Zmija po Jadranu</h1><p>Zmija pliva između otoka i lovi ribe. Svaka riba = dulji rep i brže plivanje. Rub mora vodi na drugu stranu, ali otoci i vlastiti rep — ne!</p></div></section>
 
-  <div class="stupci">
-    <div>
+  <div class="stupci mob">
+    <div class="mob-igra">
       <div class="pozornica">
         <canvas id="platno" width="400" height="400" aria-label="More s otocima i zmijom"></canvas>
         <div class="preko" id="preko"><div id="prekoSadrzaj">
@@ -45,17 +50,17 @@
       <div class="krizic" id="krizic"></div>
     </div>
     <aside style="display:flex;flex-direction:column;gap:16px">
-      <div class="statusi">
+      <div class="statusi mob-gore">
         <div class="status"><small>Ribe</small><b id="bodovi">0</b></div>
         <div class="status"><small>Duljina</small><b id="duljina">3</b></div>
         <div class="status"><small>Rekord</small><b id="rek">0</b></div>
       </div>
-      <div class="ploca"><h2>Zlatna ribica</h2><p class="pomoc" style="margin:0">Ponekad se pojavi zlatna ribica — vrijedi <b style="color:var(--zuta)">5 riba</b>, ali brzo nestaje!</p></div>
+      <div class="ploca samo-sirok"><h2>Zlatna ribica</h2><p class="pomoc" style="margin:0">Ponekad se pojavi zlatna ribica — vrijedi <b style="color:var(--zuta)">5 riba</b>, ali brzo nestaje!</p></div>
     </aside>
   </div>
 </main>
 <footer class="ig-dno"></footer>
-<script src="zajednicko/igre.js?v=4689b224"></script>
+<script src="zajednicko/igre.js?v=467e127a"></script>
 <script>
 'use strict';
 const { $, zvuk, konfeti, rekord, ikona } = IG;

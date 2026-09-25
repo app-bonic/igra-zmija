@@ -152,8 +152,8 @@
     el.innerHTML = `<div class="ig-vrh-unutra">
       <a class="ig-marka" href="${url('igre')}"><img src="zajednicko/logo.png" alt="" width="40" height="40"><span><b>app-bonic</b><small>Besplatne igre</small></span></a>
       <nav>
-        ${trenutna !== 'igre' ? `<a href="${url('igre')}">${ikona('igra')} Sve igre</a>` : ''}
-        <a href="${alatiUrl}">${ikona('alati')} Besplatni alati</a>
+        ${trenutna !== 'igre' ? `<a href="${url('igre')}" title="Sve igre">${ikona('igra')}<span class="tekst">Sve igre</span></a>` : ''}
+        <a href="${alatiUrl}" title="Besplatni alati">${ikona('alati')}<span class="tekst">Besplatni alati</span></a>
         <a class="zvuk" href="#" role="button" aria-pressed="${!tiho}" title="Zvuk">${ikona(tiho ? 'tisina' : 'zvuk')}</a>
       </nav></div>`;
     $('.zvuk', el).addEventListener('click', e => {
@@ -178,9 +178,44 @@
     document.documentElement.style.setProperty('--boja', g.boja);
     const znak = $('.znak', el);
     if (znak && !znak.innerHTML.trim()) znak.innerHTML = ikona(g.ik);
+    // na mobitelu je opis skriven iza „?” da igra stane na ekran
+    if ($('p', el) && !$('.upute-gumb', el)) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'upute-gumb'; b.textContent = '?'; b.title = 'Kako se igra?';
+      b.setAttribute('aria-expanded', 'false');
+      b.addEventListener('click', () => { const o = el.classList.toggle('otvoren'); b.setAttribute('aria-expanded', o); b.textContent = o ? '×' : '?'; visinaIgre(); });
+      el.appendChild(b);
+    }
+  }
+
+  // ---------- mobitel: koliko visine ostaje za igru (od vrha .stupci do dna ekrana) ----------
+  function visinaIgre() {
+    const z = $('.stupci') || $('.arena'); if (!z) return;
+    const vrh = z.getBoundingClientRect().top + scrollY;
+    let v = innerHeight - vrh - 10;
+    if (v < innerHeight * .6) v = innerHeight - 16;   // predugo zaglavlje → igra se pokaže pomicanjem (fokus)
+    document.documentElement.style.setProperty('--igra-v', Math.round(v) + 'px');
+  }
+  let visinaTajmer;
+  addEventListener('resize', () => { clearTimeout(visinaTajmer); visinaTajmer = setTimeout(visinaIgre, 120); });
+  // na mobitelu premjesti element na drugo mjesto (npr. gumb „Dalje” preko karte), na računalu ga vrati
+  function mobMjesto(el, cilj) {
+    if (!el || !cilj) return;
+    const mq = matchMedia('(max-width: 700px)'), roditelj = el.parentNode, iza = el.nextSibling;
+    const f = () => { if (mq.matches) cilj.appendChild(el); else roditelj.insertBefore(el, iza); };
+    f(); mq.addEventListener?.('change', f);
+  }
+  // na mobitelu pomakni stranicu tako da je cijela igra na ekranu (ako nije)
+  function fokus(el = $('.stupci') || $('.arena')) {
+    if (!el || innerWidth > 700) return;
+    const r = el.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > innerHeight + 2) scrollTo({ top: scrollY + r.top - 6, behavior: 'smooth' });
   }
   function ikoneUHtml(root = document) { $$('[data-ik]', root).forEach(s => { s.outerHTML = ikona(s.dataset.ik, s.className); }); }
 
-  window.IG = { $, $$, esc, ikona, IK, IGRE, url, lokalno, rekord, zvuk, konfeti, obavijest, efekt, dijeli, prng, promijesaj, danas, mn, audio };
+  window.IG = { $, $$, esc, ikona, IK, IGRE, url, lokalno, rekord, zvuk, konfeti, obavijest, efekt, dijeli, prng, promijesaj, danas, mn, audio, fokus, visinaIgre, mobMjesto };
   zaglavlje(); podnozje(); naslovIgre(); ikoneUHtml();
+  visinaIgre();
+  document.fonts?.ready.then(visinaIgre);
+  addEventListener('load', visinaIgre);
 })();
